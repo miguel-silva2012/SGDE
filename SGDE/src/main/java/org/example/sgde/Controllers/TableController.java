@@ -141,11 +141,7 @@ public class TableController {
         if (!saved) {
             saved = true;
 
-            if (!clothes.isEmpty()) {
-                for (Clothe clothe : clothes) {
-                    new ClotheDAO().addClothe(clothe);
-                }
-            }
+            new ClotheDAO().addClothe(clothes);
         }
 
         confirmBox.setVisible(false);
