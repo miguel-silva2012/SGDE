@@ -3,6 +3,7 @@ module org.example.sgde {
     requires javafx.fxml;
     requires java.sql;
     requires java.desktop;
+    requires mysql.connector.java;
 
 
     opens org.example.sgde to javafx.fxml;

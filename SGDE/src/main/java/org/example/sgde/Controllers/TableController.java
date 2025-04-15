@@ -35,13 +35,17 @@ public class TableController {
 
     private final ObservableList<StockItem> stock = FXCollections.observableArrayList();
 
-    boolean saved;
+    private int oldSizeClothes;
+
+    private boolean saved;
 
     @FXML
     public void initialize() {
         saved = false;
 
         Connector.getColumns(clothes);
+
+        oldSizeClothes = clothes.size();
 
         Name.setCellValueFactory(new PropertyValueFactory<>("name"));
         Price.setCellValueFactory(new PropertyValueFactory<>("price"));
@@ -65,11 +69,16 @@ public class TableController {
     public void del() {
         if (!clothes.isEmpty()) {
             Clothe selectedClothe = tableView.getSelectionModel().getSelectedItem();
+            int selectedClotheIndex = tableView.getSelectionModel().getSelectedIndex();
+
+            int lastIndex = clothes.size() - 1;
 
             if (selectedClothe != null) {
                 tableView.getItems().remove(selectedClothe);
+                tableStock.getItems().remove(selectedClotheIndex);
             } else {
-                tableView.getItems().remove(clothes.size() - 1);
+                tableView.getItems().remove(lastIndex);
+                tableStock.getItems().remove(lastIndex);
             }
         }
     }
@@ -103,6 +112,8 @@ public class TableController {
             }
         }
 
+        setInTableIsInStock();
+
         Quantity.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
 
         Quantity.setOnEditCommit(event -> {
@@ -115,16 +126,20 @@ public class TableController {
                 stock.get(selectedIndex).setStock("Tem no estoque");
             }
 
-            InStock.setCellFactory(_ -> new TableCell<StockItem, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item != null && !empty) {
-                        setText(item);
-                        setStyle("-fx-background-color: " + (item.equals("Fora de estoque") ? "red" : "green"));
-                    }
+            setInTableIsInStock();
+        });
+    }
+
+    public void setInTableIsInStock() {
+        InStock.setCellFactory(_ -> new TableCell<StockItem, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    setText(item);
+                    setStyle("-fx-background-color: " + (item.equals("Fora de estoque") ? "red" : "green"));
                 }
-            });
+            }
         });
     }
 
@@ -141,7 +156,14 @@ public class TableController {
         if (!saved) {
             saved = true;
 
-            new ClotheDAO().addClothe(clothes);
+            System.out.println("Tamanho antigo da lista: " + oldSizeClothes);
+            System.out.println("Tamanho novo da lista: " + clothes.size() + '\n');
+
+            if (!clothes.isEmpty()) {
+                for (int i = oldSizeClothes; i < clothes.size(); i++) {
+                    new ClotheDAO().addClothe(clothes.get(i));
+                }
+            }
         }
 
         confirmBox.setVisible(false);
