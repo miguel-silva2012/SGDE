@@ -73,15 +73,6 @@ public class TableController {
             if (selectedClothe != null) {
                 tableView.getItems().remove(selectedClothe);
                 tableStock.getItems().remove(selectedClotheIndex);
-
-                new ClotheDAO().delClothe(selectedClotheIndex);
-            } else {
-                int lastIndex = clothes.size() - 1;
-
-                tableView.getItems().remove(lastIndex);
-                tableStock.getItems().remove(lastIndex);
-
-                new ClotheDAO().delClothe(lastIndex);
             }
         }
     }
