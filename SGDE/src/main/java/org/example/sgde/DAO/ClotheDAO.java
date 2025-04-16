@@ -23,4 +23,14 @@ public class ClotheDAO {
             ps.close();
         } catch (SQLException _) {}
     }
+
+    public void delClothe(int id) {
+        String sql = "DELETE FROM clothes WHERE id = " + id;
+        try {
+            PreparedStatement ps = Connector.getConnection().prepareStatement(sql);
+
+            ps.execute();
+            ps.close();
+        } catch (SQLException _) {}
+    }
 }

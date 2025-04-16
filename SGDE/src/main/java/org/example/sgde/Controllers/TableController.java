@@ -29,11 +29,11 @@ public class TableController {
 
     @FXML public TableColumn<Clothe, Integer> Quantity;
 
-    @FXML private HBox confirmBox;
-
     private final ObservableList<Clothe> clothes = FXCollections.observableArrayList();
 
     private final ObservableList<StockItem> stock = FXCollections.observableArrayList();
+
+    @FXML private HBox confirmBox;
 
     private int oldSizeClothes;
 
@@ -50,7 +50,6 @@ public class TableController {
         Name.setCellValueFactory(new PropertyValueFactory<>("name"));
         Price.setCellValueFactory(new PropertyValueFactory<>("price"));
         Quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-
         InStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
         editInitializer();
@@ -71,14 +70,18 @@ public class TableController {
             Clothe selectedClothe = tableView.getSelectionModel().getSelectedItem();
             int selectedClotheIndex = tableView.getSelectionModel().getSelectedIndex();
 
-            int lastIndex = clothes.size() - 1;
-
             if (selectedClothe != null) {
                 tableView.getItems().remove(selectedClothe);
                 tableStock.getItems().remove(selectedClotheIndex);
+
+                new ClotheDAO().delClothe(selectedClotheIndex);
             } else {
+                int lastIndex = clothes.size() - 1;
+
                 tableView.getItems().remove(lastIndex);
                 tableStock.getItems().remove(lastIndex);
+
+                new ClotheDAO().delClothe(lastIndex);
             }
         }
     }
@@ -104,11 +107,7 @@ public class TableController {
     private void setEditableQuantity() {
         if (!clothes.isEmpty()) {
             for (Clothe c : clothes) {
-                if (c.isInStock()) {
-                    stock.add(new StockItem("Tem no estoque"));
-                } else {
-                    stock.add(new StockItem("Fora de estoque"));
-                }
+                stock.add(new StockItem(c.isInStock() ? "Tem no estoque" : "Fora de estoque"));
             }
         }
 
@@ -118,13 +117,14 @@ public class TableController {
 
         Quantity.setOnEditCommit(event -> {
             Clothe clothe = event.getTableView().getItems().get(event.getTablePosition().getRow());
-            clothe.setQuantity(event.getNewValue());
 
             int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
 
             if (clothe.isInStock() && !stock.isEmpty()) {
                 stock.get(selectedIndex).setStock("Tem no estoque");
             }
+
+            clothe.setQuantity(event.getNewValue());
 
             setInTableIsInStock();
         });
