@@ -1,6 +1,5 @@
 package org.example.sgde.DAO;
 
-import javafx.collections.ObservableList;
 import org.example.sgde.Connector;
 import org.example.sgde.Entitys.Clothe;
 
